@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Tlapohualli;
 
@@ -7,42 +8,44 @@ namespace Tlapohualli;
 /// </summary>
 class Program
 {
-    private static readonly string Quit = "quit";
-    private static readonly string Instructions = $"Must be a number between {Translator.MinNumber} and {Translator.MaxNumber}.";
-
-    public static void Main()
+    public static int Main()
     {
         Log.Info("-----------------");
         Log.Info("-- TLAPOHUALLI --");
         Log.Info("-----------------");
-        Log.Info("Type a number to get its Nahuatl name.");
-        Log.Info($"Type '{Quit}' to exit program.");
-        Log.Info(Instructions);
+
+        Resources r = Resources.ChooseLanguage();
+        Log.Info(r.SelectedLanguage);
+
+        Log.Info(r.TypeANumberToGetItsName);
+        Log.Info(r.TypeQuitToExitProgram);
+        Log.Info(r.MustBeANumberBetween);
 
         string selection = string.Empty;
-        while (selection.ToLowerInvariant() != Quit)
+        while (!selection.Equals(r.Quit, StringComparison.InvariantCultureIgnoreCase))
         {
-            Console.Write("Number: ");
+            Console.Write($"{r.Number}: ");
             selection = Console.ReadLine();
-            if (selection.Equals(Quit, StringComparison.InvariantCultureIgnoreCase))
+            if (selection.Equals(r.Quit, StringComparison.InvariantCultureIgnoreCase))
             {
                 break;
             }
             if (!int.TryParse(selection, out int number))
             {
-                Log.Error($"{Instructions}");
+                Log.Error(r.MustBeANumberBetween);
             }
             else if (number >= Translator.MinNumber && number <= Translator.MaxNumber)
             {
                 string translation = Translator.Translate(number);
-                Log.Success($"Nahuatl: {translation}");
+                Log.Success($"{r.NumberInNahuatl}: {translation}");
             }
             else
             {
-                Log.Error($"{Instructions}");
+                Log.Error(r.MustBeANumberBetween);
             }
         }
 
-        Log.Info("Goodbye!");
+        Log.Info(r.Goodbye);
+        return 0;
     }
 }
