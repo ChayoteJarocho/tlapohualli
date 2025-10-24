@@ -1,45 +1,51 @@
 ﻿using System;
+using System.Diagnostics;
 
-namespace Tlapohualli
+namespace Tlapohualli;
+
+/// <summary>
+/// This program converts integer number names (base 10) to their Nahuatl translation (base 20).
+/// </summary>
+class Program
 {
-    /// <summary>
-    /// This program converts integer number names (base 10) to their Nahuatl translation (base 20).
-    /// </summary>
-    class Program
+    public static int Main()
     {
-        private static readonly string Quit = "quit";
-        private static readonly string Instructions = $"Must be a number between {Translator.MinNumber} and {Translator.MaxNumber}.";
+        Log.Info("-----------------");
+        Log.Info("-- TLAPOHUALLI --");
+        Log.Info("-----------------");
 
-        public static void Main()
+        Resources r = Resources.ChooseLanguage();
+        Log.Info(r.SelectedLanguage);
+
+        Log.Info(r.TypeANumberToGetItsName);
+        Log.Info(r.TypeQuitToExitProgram);
+        Log.Info(r.MustBeANumberBetween);
+
+        string selection = string.Empty;
+        while (!selection.Equals(r.Quit, StringComparison.InvariantCultureIgnoreCase))
         {
-            Log.Info("-----------------");
-            Log.Info("-- TLAPOHUALLI --");
-            Log.Info("-----------------");
-            Log.Info("Type an number to get its Nahuatl name.");
-            Log.Info($"Type '{Quit}' to exit program.");
-            Log.Info(Instructions);
-
-            string selection = string.Empty;
-            while (selection.ToLowerInvariant() != Quit)
+            Console.Write($"{r.Number}: ");
+            selection = Console.ReadLine();
+            if (selection.Equals(r.Quit, StringComparison.InvariantCultureIgnoreCase))
             {
-                Console.Write("Number: ");
-                selection = Console.ReadLine();
-                if (!int.TryParse(selection, out int number))
-                {
-                    Log.Error($"{Instructions}");
-                }
-                else if (number >= Translator.MinNumber && number <= Translator.MaxNumber)
-                {
-                    string translation = Translator.Translate(number);
-                    Log.Success($"Nahuatl: {translation}");
-                }
-                else
-                {
-                    Log.Error($"{Instructions}");
-                }
+                break;
             }
-
-            Log.Info("Goodbye!");
+            if (!int.TryParse(selection, out int number))
+            {
+                Log.Error(r.MustBeANumberBetween);
+            }
+            else if (number >= Translator.MinNumber && number <= Translator.MaxNumber)
+            {
+                string translation = Translator.Translate(number);
+                Log.Success($"{r.NumberInNahuatl}: {translation}");
+            }
+            else
+            {
+                Log.Error(r.MustBeANumberBetween);
+            }
         }
+
+        Log.Info(r.Goodbye);
+        return 0;
     }
 }
