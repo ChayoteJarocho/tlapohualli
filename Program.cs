@@ -24,6 +24,10 @@ class Program
         {
             Console.Write("Number: ");
             selection = Console.ReadLine();
+            if (selection.Equals(Quit, StringComparison.InvariantCultureIgnoreCase))
+            {
+                break;
+            }
             if (!int.TryParse(selection, out int number))
             {
                 Log.Error($"{Instructions}");
