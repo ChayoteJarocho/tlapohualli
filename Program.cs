@@ -15,7 +15,7 @@ class Program
         Log.Info("-----------------");
         Log.Info("-- TLAPOHUALLI --");
         Log.Info("-----------------");
-        Log.Info("Type an number to get its Nahuatl name.");
+        Log.Info("Type a number to get its Nahuatl name.");
         Log.Info($"Type '{Quit}' to exit program.");
         Log.Info(Instructions);
 
