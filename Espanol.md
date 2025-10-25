@@ -1,4 +1,4 @@
-# Explanation
+# Explicación
 
 El Náhuatl es la lengua de los Mexicas, también conocidos como Aztecas.
 
