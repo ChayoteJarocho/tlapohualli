@@ -53,7 +53,6 @@ jobs:
       - name: Publish macOS (arm64)
         run: dotnet publish Tlapohualli.csproj -c Release -r osx-arm64 --self-contained true -o publish/macos-arm64 /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=false /p:TrimMode=link /p:EnableCompressionInSingleFile=true /p:DebugType=None /p:DebugSymbols=false /p:CopyOutputSymbolsToPublishDirectory=false
 
-
       - name: Zip Releases
         run: |
           cd publish/linux && zip -r ../../tlapohualli-linux-v${ env.RELEASE_VERSION }.zip .
