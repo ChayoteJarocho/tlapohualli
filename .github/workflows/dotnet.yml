@@ -55,11 +55,10 @@ jobs:
 
       - name: Zip Releases
         run: |
-          cd publish/linux && zip -r ../../tlapohualli-linux-v${ env.RELEASE_VERSION }.zip .
-          cd publish/windows && zip -r ../../tlapohualli-windows-v${ env.RELEASE_VERSION }.zip .
-          cd publish/macos-x64 && zip -r ../../tlapohualli-macos-x64-v${RELEASE_VERSION}.zip .
-          cd publish/macos-arm64 && zip -r ../../tlapohualli-macos-arm64-v${RELEASE_VERSION}.zip .
-      
+          (cd publish/linux && zip -r ../../tlapohualli-linux-v${RELEASE_VERSION}.zip .)
+          (cd publish/windows && zip -r ../../tlapohualli-windows-v${RELEASE_VERSION}.zip .)
+          (cd publish/macos-x64 && zip -r ../../tlapohualli-macos-x64-v${RELEASE_VERSION}.zip .)
+          (cd publish/macos-arm64 && zip -r ../../tlapohualli-macos-arm64-v${RELEASE_VERSION}.zip .)
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
