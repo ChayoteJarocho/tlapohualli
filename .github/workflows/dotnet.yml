@@ -3,14 +3,15 @@ name: .NET
 on:
   push:
     branches: [ master ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ master ]
 
 jobs:
+  
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -23,3 +24,50 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Get version
+        id: version
+        run: echo "RELEASE_VERSION=$(dotnet msbuild -getProperty:Version -verbosity:quiet Tlapohualli.csproj)" >> $GITHUB_ENV
+
+      - name: Publish Linux
+        run: dotnet publish Tlapohualli.csproj -c Release -r linux-x64 --self-contained true -o publish/linux /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=false /p:TrimMode=link /p:EnableCompressionInSingleFile=true /p:DebugType=None /p:DebugSymbols=false /p:CopyOutputSymbolsToPublishDirectory=false
+      
+      - name: Publish Windows
+        run: dotnet publish Tlapohualli.csproj -c Release -r win-x64 --self-contained true -o publish/windows /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=false /p:TrimMode=link /p:EnableCompressionInSingleFile=true /p:DebugType=None /p:DebugSymbols=false /p:CopyOutputSymbolsToPublishDirectory=false
+
+      - name: Publish macOS (x64)
+        run: dotnet publish Tlapohualli.csproj -c Release -r osx-x64 --self-contained true -o publish/macos-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=false /p:TrimMode=link /p:EnableCompressionInSingleFile=true /p:DebugType=None /p:DebugSymbols=false /p:CopyOutputSymbolsToPublishDirectory=false
+
+      - name: Publish macOS (arm64)
+        run: dotnet publish Tlapohualli.csproj -c Release -r osx-arm64 --self-contained true -o publish/macos-arm64 /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=false /p:TrimMode=link /p:EnableCompressionInSingleFile=true /p:DebugType=None /p:DebugSymbols=false /p:CopyOutputSymbolsToPublishDirectory=false
+
+      - name: Zip Releases
+        run: |
+          cd publish/linux && zip -r ../../tlapohualli-linux-v${ env.RELEASE_VERSION }.zip .
+          cd publish/windows && zip -r ../../tlapohualli-windows-v${ env.RELEASE_VERSION }.zip .
+          cd publish/macos-x64 && zip -r ../../tlapohualli-macos-x64-v${RELEASE_VERSION}.zip .
+          cd publish/macos-arm64 && zip -r ../../tlapohualli-macos-arm64-v${RELEASE_VERSION}.zip .
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            tlapohualli-linux-v${{ env.RELEASE_VERSION }}.zip
+            tlapohualli-windows-v${{ env.RELEASE_VERSION }}.zip
+            tlapohualli-macos-x64-v${{ env.RELEASE_VERSION }}.zip
+            tlapohualli-macos-arm64-v${{ env.RELEASE_VERSION }}.zip
+          name: Release v${{ env.RELEASE_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
